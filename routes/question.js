@@ -1,5 +1,5 @@
 const express= require('express')
-const { questions, score, questionList, insertQuestionList, deleteQuestionList ,updateQuestionList,leaderboard } = require('../controller/question')
+const { questions, score, questionList, insertQuestionList, deleteQuestionList ,updateQuestionList,leaderboard , defaultQuestionList} = require('../controller/question')
 const router=express.Router()
 const requireAuth=require('../middlerware/requireAuth')
 
@@ -29,6 +29,10 @@ router.delete('/questionList/:subject', requireAuth, deleteQuestionList)
 // update questionList
 
 router.patch('/questionList/:subject',requireAuth,updateQuestionList)
+
+// geting default list
+
+router.get('/defaultQuestionList',requireAuth,defaultQuestionList)
 
 
 

@@ -9,7 +9,7 @@ const Score = require('../models/score')
 
 const questions=async(req,res)=>{
     const {subject}=req.body
-    console.log(req.body)
+    // console.log(req.body)
     try{
         const questionList2=await (await QuestionList.find({title:subject}))[0].populate('questions')
         res.status(200).json({questionList2})
@@ -125,7 +125,7 @@ const insertQuestionList=async (req, res)=>{
         // console.log(req.body.FinalList)
 
         const user=req.user
-        console.log(user)
+        // console.log(user)
         const title=req.body.FinalList.title
         const answers=req.body.FinalList.answers
         const Qlist=req.body.FinalList.questions
@@ -137,7 +137,7 @@ const insertQuestionList=async (req, res)=>{
         const newList=await QuestionList.create({title,answers,questions:Qid})
         user.questionList.push(newList._id)
         await user.save();
-        res.status(200).json({message:`Question List ${newList.title} is inserted successfully`})
+        res.status(200).json({message:`QuestionList ${newList.title} is inserted successfully`})
     }
     catch(error){
         res.status(400).json({error:error.message})
@@ -150,7 +150,7 @@ const insertQuestionList=async (req, res)=>{
 const deleteQuestionList=async (req,res)=>{
 
     const {subject}=req.params
-    console.log(subject)
+    // console.log(subject)
 
     try{
         const questionList=await QuestionList.findOne({title:subject})
@@ -165,10 +165,10 @@ const deleteQuestionList=async (req,res)=>{
         const newArrayWithoutDeletedId = req.user.questionList.filter(id => !id.equals(questionList._id));
     
 
-        console.log(newArrayWithoutDeletedId)
+        // console.log(newArrayWithoutDeletedId)
 
         req.user.questionList=newArrayWithoutDeletedId
-        console.log(req.user.questionList)
+        // console.log(req.user.questionList)
 
         await req.user.save()
     
@@ -208,10 +208,20 @@ const updateQuestionList=async(req,res)=>{
     }
 }
 
+const defaultQuestionList=async(req,res)=>{
+    try{
+        const list= await (await User.findOne({username:"admin"})).populate('questionList')
+        res.status(200).json({queationslist:list.questionList})
+    }
+    catch(error){
+        res.status(400).json({error:error.message})
+    }
+}
+
 
 const leaderboard=async(req,res)=>{
 
 }
 
 
-module.exports={questions, score,questionList, insertQuestionList, deleteQuestionList, updateQuestionList,leaderboard}
+module.exports={questions, score,questionList, insertQuestionList, deleteQuestionList, updateQuestionList,leaderboard, defaultQuestionList}

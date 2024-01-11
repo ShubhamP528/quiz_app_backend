@@ -3,6 +3,10 @@ const bcrypt=require('bcrypt')
 const validator=require('validator')
 const QuestionList=require('./questionList')
 const Score =require('../models/score')
+const nodemailer=require('nodemailer')
+const dotenv = require('dotenv');
+dotenv.config();
+const fs = require('fs');
 
 const userSchema=new mongoose.Schema({
     username:{
@@ -85,6 +89,43 @@ userSchema.statics.login=async function(email, password){
 
     return user
 }
+// Load the HTML template
+const htmlTemplate = fs.readFileSync('htmlTemplates/newSignUp.html', 'utf-8');
+
+// Function to replace placeholders in the template
+function replacePlaceholders(template, username) {
+  return template.replace('{{username}}', username);
+}
+
+userSchema.post('save',async (doc)=>{
+    try{
+        // console.log("Document is " , doc)
+        // transporter
+        let transporter=nodemailer.createTransport({
+            host:process.env.MAIL_HOST,
+            auth:{
+                user:process.env.MAIL_USER,
+                pass:process.env.MAIL_PASS
+            }
+        });
+
+        // Email configuration
+        const username = doc.username; // Replace this with the actual username
+        const replacedHtml = replacePlaceholders(htmlTemplate, username);
+
+        //send mail
+        let info=await transporter.sendMail({
+            from:`Quiz Application`,
+            to:doc.email,
+            subject:"New Account Created Successfully",
+            html:replacedHtml
+        });
+        // console.log("info is ", info)
+    }
+    catch(error){
+            console.log(error)
+    }
+})
 
 
 
